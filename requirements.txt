@@ -1,0 +1,9 @@
+paddlepaddle
+paddleocr
+opencv-python
+Pillow
+pdf2image
+chromadb
+sentence-transformers
+anthropic
+python-dotenv
