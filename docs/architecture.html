@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>RAGToySys — Architecture</title>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <style>
+    body { font-family: -apple-system, sans-serif; background: #0d1117; color: #e6edf3; margin: 0; padding: 24px; }
+    h1 { font-size: 1.4rem; color: #58a6ff; margin-bottom: 4px; }
+    p  { color: #8b949e; font-size: 0.85rem; margin-top: 0; margin-bottom: 24px; }
+    .mermaid { background: #161b22; border-radius: 10px; padding: 24px; }
+  </style>
+</head>
+<body>
+  <h1>RAGToySys — System Architecture</h1>
+  <p>CV/CG Paper Research Agent · as of 2026-05-20</p>
+
+  <div class="mermaid">
+flowchart TB
+
+  %% ── Inputs ──────────────────────────────────────────────
+  subgraph IN["📥 Input"]
+    PDF["PDF File"]
+    ARXIV["arXiv ID / URL"]
+    QUERY["User Query"]
+  end
+
+  %% ── Paper Layer ─────────────────────────────────────────
+  subgraph PAPER["📄 Paper Layer"]
+    direction TB
+    AX["arxiv.py\ndownload + metadata"]
+    PI["ingestor.py\npaper-aware ingestion"]
+    S2["semantic_scholar.py\nreferences + related"]
+    RK["ranker.py\nB→D→C ranking"]
+    AX --> PI
+    S2 --> RK
+  end
+
+  %% ── Ingestion ───────────────────────────────────────────
+  subgraph ING["⚙️ Ingestion Pipeline"]
+    direction TB
+    OCR["extractor.py\nfitz → PaddleOCR fallback"]
+    CLN["cleaner.py"]
+    CHK["chunker.py\nchunk_size=500, overlap=50"]
+    OCR --> CLN --> CHK
+  end
+
+  %% ── Storage ─────────────────────────────────────────────
+  subgraph STORE["🗄️ Storage"]
+    direction TB
+    VDB[("ChromaDB\nvector store")]
+    PDFS[/"papers/\nPDF cache"/]
+  end
+
+  %% ── Retrieval ───────────────────────────────────────────
+  subgraph RET["🔍 Retrieval"]
+    direction TB
+    EMB["embedder.py\nall-MiniLM-L6-v2"]
+    BM25["bm25_retriever.py\nBM25Okapi"]
+    HYB["hybrid.py\nRRF fusion"]
+    RNK["reranker.py\nCrossEncoder"]
+    EMB --> HYB
+    BM25 --> HYB
+    HYB --> RNK
+  end
+
+  %% ── Providers ───────────────────────────────────────────
+  subgraph PROV["🤖 Providers"]
+    direction LR
+    CL["Claude\nLLM + Vision"]
+    OL["Ollama\nLLM (llama3.1)\nVision (llava:13b)"]
+  end
+
+  %% ── Extraction ──────────────────────────────────────────
+  subgraph EXT["🔬 Extraction (Phase 3)"]
+    direction TB
+    ARCH["architecture.py\nLLM → JSON\n{backbone, components, loss}"]
+    FIG["figures.py\nVision → figure description\n(VISION_PROVIDER=none by default)"]
+  end
+
+  %% ── Generation ──────────────────────────────────────────
+  subgraph GEN["💬 Generation"]
+    direction TB
+    AGT["ReAct Agent\ngeneration/agent.py\nMAX_ITER=10"]
+    subgraph TOOLS["Agent Tools"]
+      direction LR
+      T1["search_knowledge_base"]
+      T2["get_reading_list"]
+      T3["analyze_paper_architecture"]
+      T4["ingest_arxiv"]
+    end
+    AGT --> TOOLS
+  end
+
+  %% ── Evaluation ──────────────────────────────────────────
+  subgraph EVAL["📊 Evaluation Harness (Phase 3.5)"]
+    direction TB
+    GS["goldset/\nsearch.json · architecture.json"]
+    MET["metrics.py\nRecall@K · Hit Rate\nField Completeness · Coverage"]
+    JDG["judge.py\nLLM-as-Judge 1~5점"]
+    RPT["run.py → reports/*.json"]
+    GS --> MET --> RPT
+    JDG --> RPT
+  end
+
+  %% ── CLI ─────────────────────────────────────────────────
+  CLI["🖥️ CLI  app/cli.py\ningest · query · agent · list · remove"]
+
+  %% ── Flow: Ingestion path ────────────────────────────────
+  PDF --> ING
+  ARXIV --> PAPER
+  PAPER --> PI --> ING
+  ING --> CHK
+  CHK -->|embed| EMB
+  CHK -->|store| VDB
+  ARXIV -->|cache| PDFS
+
+  %% ── Flow: Query path ────────────────────────────────────
+  QUERY --> CLI --> AGT
+  AGT -->|search| RET
+  RET -->|query| VDB
+  RET --> RNK -->|top-k chunks| AGT
+
+  %% ── Flow: Reading list ──────────────────────────────────
+  AGT -->|arxiv_id| S2
+  RK -->|ranked papers| AGT
+
+  %% ── Flow: Architecture extraction ───────────────────────
+  AGT -->|arxiv_id| EXT
+  PDFS -->|pdf_path| ARCH
+  ARCH -->|JSON| AGT
+  FIG -->|descriptions| AGT
+
+  %% ── Flow: Providers ─────────────────────────────────────
+  PROV -->|LLM completions| AGT
+  PROV -->|LLM completions| ARCH
+  PROV -->|Vision analysis| FIG
+  PROV -->|Judge scoring| JDG
+
+  %% ── Evaluation flow ─────────────────────────────────────
+  GS -->|queries| RET
+  GS -->|arxiv_ids| ARCH
+
+  %% ── CLI connects ────────────────────────────────────────
+  CLI -->|ingest| ING
+  CLI -->|eval| EVAL
+
+  %% ── Styles ──────────────────────────────────────────────
+  classDef store    fill:#1f3d2e,stroke:#3fb950,color:#e6edf3
+  classDef provider fill:#1f2d3d,stroke:#58a6ff,color:#e6edf3
+  classDef eval     fill:#2d1f3d,stroke:#bc8cff,color:#e6edf3
+  classDef input    fill:#2d2208,stroke:#d29922,color:#e6edf3
+  classDef cli      fill:#1f1f1f,stroke:#8b949e,color:#e6edf3
+
+  class VDB,PDFS store
+  class CL,OL provider
+  class EVAL,GS,MET,JDG,RPT eval
+  class PDF,ARXIV,QUERY input
+  class CLI cli
+  </div>
+</body>
+</html>

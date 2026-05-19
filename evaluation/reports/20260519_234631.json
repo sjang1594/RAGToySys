@@ -1,0 +1,229 @@
+{
+  "timestamp": "2026-05-19T23:46:31.252653",
+  "search": {
+    "recall_at_k": 1.0,
+    "hit_rate": 1.0,
+    "k": 4,
+    "total": 10,
+    "hits": 10,
+    "details": [
+      {
+        "id": "s-001",
+        "query": "sliding window attention memory efficiency",
+        "expected": [
+          "2310.06825.pdf"
+        ],
+        "retrieved": [
+          "2310.06825.pdf"
+        ],
+        "hit": true
+      },
+      {
+        "id": "s-002",
+        "query": "grouped query attention inference speed",
+        "expected": [
+          "2310.06825.pdf"
+        ],
+        "retrieved": [
+          "2310.06825.pdf"
+        ],
+        "hit": true
+      },
+      {
+        "id": "s-003",
+        "query": "rolling buffer cache key value",
+        "expected": [
+          "2310.06825.pdf"
+        ],
+        "retrieved": [
+          "2310.06825.pdf"
+        ],
+        "hit": true
+      },
+      {
+        "id": "s-004",
+        "query": "language model benchmark comparison Llama",
+        "expected": [
+          "2310.06825.pdf"
+        ],
+        "retrieved": [
+          "2310.06825.pdf"
+        ],
+        "hit": true
+      },
+      {
+        "id": "s-005",
+        "query": "pre-fill chunking prompt processing",
+        "expected": [
+          "2310.06825.pdf"
+        ],
+        "retrieved": [
+          "2310.06825.pdf"
+        ],
+        "hit": true
+      },
+      {
+        "id": "s-006",
+        "query": "transformer architecture attention window size",
+        "expected": [
+          "2310.06825.pdf"
+        ],
+        "retrieved": [
+          "2310.06825.pdf"
+        ],
+        "hit": true
+      },
+      {
+        "id": "s-007",
+        "query": "instruction fine-tuning chat model",
+        "expected": [
+          "2310.06825.pdf"
+        ],
+        "retrieved": [
+          "2310.06825.pdf"
+        ],
+        "hit": true
+      },
+      {
+        "id": "s-008",
+        "query": "model perplexity evaluation commonsense reasoning",
+        "expected": [
+          "2310.06825.pdf"
+        ],
+        "retrieved": [
+          "2310.06825.pdf"
+        ],
+        "hit": true
+      },
+      {
+        "id": "s-009",
+        "query": "xformers memory efficient attention implementation",
+        "expected": [
+          "2310.06825.pdf"
+        ],
+        "retrieved": [
+          "2310.06825.pdf"
+        ],
+        "hit": true
+      },
+      {
+        "id": "s-010",
+        "query": "7 billion parameter open source language model",
+        "expected": [
+          "2310.06825.pdf"
+        ],
+        "retrieved": [
+          "2310.06825.pdf"
+        ],
+        "hit": true
+      }
+    ]
+  },
+  "architecture": {
+    "mean_field_completeness": 1.0,
+    "mean_component_coverage": 0.5,
+    "mean_judge_score": 4.0,
+    "total": 3,
+    "details": [
+      {
+        "id": "a-001",
+        "arxiv_id": "2310.06825",
+        "title": "Mistral 7B",
+        "field_completeness": 1.0,
+        "component_coverage": 1.0,
+        "judge_score": 4,
+        "judge_issues": [
+          "Loss functions and datasets are not mentioned, but it's likely that they are not a key part of the paper's contribution, so this is a minor omission."
+        ],
+        "judge_reasoning": "The extraction is mostly accurate, but it misses the key components that must be included, which are Sliding Window Attention and Grouped-Query Attention. The rest of the information is present and correct.",
+        "extracted": {
+          "title": "Mistral 7B: A 7-Billion-Parameter Language Model for Superior Performance and Efficiency",
+          "problem": "The problem of balancing high-performance language models with efficient inference and deployment",
+          "approach": "Introducing Mistral 7B, a 7-billion-parameter language model that leverages grouped-query attention (GQA) and sliding window attention (SWA) to achieve superior performance and efficiency",
+          "backbone": "Transformer architecture",
+          "key_components": [
+            "Grouped-query attention (GQA)",
+            "Sliding window attention (SWA)",
+            "Rolling buffer cache",
+            "Pre-fill and chunking"
+          ],
+          "loss_functions": "Not mentioned",
+          "datasets": "Not mentioned",
+          "key_results": "Mistral 7B outperforms the best open 13B model (Llama 2) across all evaluated benchmarks, and the best released 34B model (Llama 1) in reasoning, mathematics, and code generation",
+          "novelty": "The combination of GQA and SWA attention mechanisms, along with the rolling buffer cache and pre-fill and chunking techniques, allows for faster inference and reduced memory usage while maintaining high performance"
+        }
+      },
+      {
+        "id": "a-002",
+        "arxiv_id": "1706.03762",
+        "title": "Attention Is All You Need",
+        "field_completeness": 1.0,
+        "component_coverage": 0.5,
+        "judge_score": 4,
+        "judge_issues": [
+          "Missing key component 'positional encoding' in key_components",
+          "Key results should be a numerical value or a list of numerical values, not a string"
+        ],
+        "judge_reasoning": "The extraction is mostly correct, but it lacks the crucial 'positional encoding' component and incorrectly represents the key results as a string instead of a numerical value or a list of numerical values.",
+        "extracted": {
+          "title": "Attention Is All You Need",
+          "problem": "Improving the efficiency and parallelization of sequence transduction models",
+          "approach": "Proposing a new model architecture, the Transformer, that relies entirely on attention mechanisms",
+          "backbone": "Transformer",
+          "key_components": [
+            "Multi-Head Attention",
+            "Position-wise Fully Connected Feed-Forward Network",
+            "Residual Connection",
+            "Layer Normalization"
+          ],
+          "loss_functions": [
+            "BLEU score"
+          ],
+          "datasets": [
+            "WMT 2014 English-to-German translation task",
+            "WMT 2014 English-to-French translation task",
+            "English constituency parsing"
+          ],
+          "key_results": "28.4 BLEU on WMT 2014 English-to-German, 41.8 BLEU on WMT 2014 English-to-French",
+          "novelty": "The first transduction model relying entirely on self-attention to compute representations of its input and output"
+        }
+      },
+      {
+        "id": "a-003",
+        "arxiv_id": "2010.11929",
+        "title": "An Image is Worth 16x16 Words (ViT)",
+        "field_completeness": 1.0,
+        "component_coverage": 0.0,
+        "judge_score": 4,
+        "judge_issues": [
+          "The key_components_must_include field is missing 'patch embedding' and 'multi-head attention' which are crucial components of the Transformer architecture.",
+          "The key_results field is a string, it should be a list or a more structured format."
+        ],
+        "judge_reasoning": "The extraction is mostly correct but lacks some crucial details and has minor formatting issues.",
+        "extracted": {
+          "title": "AN IMAGE IS WORTH 16X16 WORDS: TRANSFORMERS FOR IMAGE RECOGNITION AT SCALE",
+          "problem": "The paper solves the problem of applying Transformer architecture to image recognition tasks, which has been limited by the need for convolutional neural networks (CNNs).",
+          "approach": "The authors apply a standard Transformer directly to images, splitting them into patches and providing the sequence of linear embeddings of these patches as an input to a Transformer.",
+          "backbone": "Vision Transformer (ViT)",
+          "key_components": [
+            "Vision Transformer",
+            "Transformer architecture",
+            "Self-attention"
+          ],
+          "loss_functions": [
+            "Supervised classification loss"
+          ],
+          "datasets": [
+            "ImageNet-21k",
+            "JFT-300M",
+            "ImageNet-ReaL",
+            "CIFAR-100",
+            "VTAB"
+          ],
+          "key_results": "88.55% accuracy on ImageNet, 90.72% on ImageNet-ReaL, 94.55% on CIFAR-100, and 77.63% on the VTAB suite of 19 tasks.",
+          "novelty": "The paper demonstrates that large scale pre-training makes vanilla Transformers competitive with (or even better than) state-of-the-art CNNs."
+        }
+      }
+    ]
+  }
+}

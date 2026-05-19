@@ -117,8 +117,8 @@ TOOLS = [
                 },
                 "include_figures": {
                     "type": "boolean",
-                    "description": "Whether to extract figure descriptions via Vision (default: true)",
-                    "default": True,
+                    "description": "Whether to extract figure descriptions via Vision (default: false). Only effective when VISION_PROVIDER=claude.",
+                    "default": False,
                 },
             },
             "required": ["arxiv_id"],
@@ -132,7 +132,7 @@ _MATH_NS.update({"abs": abs, "round": round})
 
 def _tool_search(query: str, top_k: int = 4) -> str:
     from retrieval.hybrid import hybrid_retrieve
-    results = hybrid_retrieve(query, top_k=top_k)
+    results = hybrid_retrieve(query, top_k=int(top_k))
     if not results:
         return "No relevant documents found."
     parts = []
@@ -175,7 +175,7 @@ def _tool_calculator(expression: str) -> str:
 
 def _tool_reading_list(arxiv_id: str, top_k: int = 10) -> str:
     from paper.ranker import build_reading_list
-    papers = build_reading_list(arxiv_id, top_k=top_k)
+    papers = build_reading_list(arxiv_id, top_k=int(top_k))
     if not papers:
         return f"No related papers found for {arxiv_id}."
     lines = [f"Reading list for {arxiv_id} (B→D→C ranking):\n"]
@@ -190,7 +190,7 @@ def _tool_ingest_arxiv(arxiv_id: str) -> str:
     return f"Ingested arXiv:{arxiv_id} — {count} chunks stored."
 
 
-def _tool_analyze_architecture(arxiv_id: str, include_figures: bool = True) -> str:
+def _tool_analyze_architecture(arxiv_id: str, include_figures: bool = False) -> str:
     import json
     from paper.arxiv import download_pdf, parse_id
     from config import PAPERS_DIR
@@ -268,9 +268,11 @@ def run(task: str, verbose: bool = True) -> str:
         response = provider.complete(
             messages=messages,
             system=(
-                "You are a helpful assistant with access to a personal knowledge base. "
-                "Use tools to gather information before answering. "
-                "Think step by step. When you have enough information, provide a final answer."
+                "You are a research assistant with access to a knowledge base of ML/CV/CG papers. "
+                "IMPORTANT: You MUST call tools to retrieve information — do NOT answer from memory alone. "
+                "ALWAYS call search_knowledge_base first before answering any question about papers or techniques. "
+                "Only provide a final answer after you have retrieved context from the knowledge base. "
+                "Do not describe what you would do — just do it by calling the tool directly."
             ),
             tools=TOOLS,
             max_tokens=2048,

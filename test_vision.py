@@ -37,11 +37,11 @@ def main():
     tested = 0
     for page_num in range(min(8, len(doc))):
         page = doc[page_num]
-        pix = page.get_pixmap(dpi=72)
+        pix = page.get_pixmap(dpi=150)
         img_bytes = pix.tobytes("jpeg")
 
         print(f"\n[Page {page_num + 1}]")
-        result = provider.analyze(img_bytes, "What do you see in this image?").strip()
+        result = provider.analyze(img_bytes, prompt).strip()
         print(result if result else "(empty)")
         tested += 1
 

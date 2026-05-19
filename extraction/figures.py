@@ -1,7 +1,7 @@
-import io
 from dataclasses import dataclass
 from pathlib import Path
 
+from config import VISION_PROVIDER
 from providers import get_vision_provider
 
 _FIGURE_PROMPT = (
@@ -24,6 +24,9 @@ def extract_figures(pdf_path: Path, max_pages: int = 8) -> list[FigureDescriptio
     Render PDF pages as images using pymupdf and describe architecture figures via Vision provider.
     Returns only pages that contain meaningful figures.
     """
+    if VISION_PROVIDER == "none":
+        return []
+
     try:
         import fitz
     except ImportError:

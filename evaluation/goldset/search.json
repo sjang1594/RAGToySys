@@ -1,0 +1,62 @@
+[
+  {
+    "id": "s-001",
+    "query": "sliding window attention memory efficiency",
+    "expected_sources": ["2310.06825.pdf"],
+    "note": "Mistral 7B SWA description"
+  },
+  {
+    "id": "s-002",
+    "query": "grouped query attention inference speed",
+    "expected_sources": ["2310.06825.pdf"],
+    "note": "Mistral 7B GQA section"
+  },
+  {
+    "id": "s-003",
+    "query": "rolling buffer cache key value",
+    "expected_sources": ["2310.06825.pdf"],
+    "note": "Mistral 7B KV cache section"
+  },
+  {
+    "id": "s-004",
+    "query": "language model benchmark comparison Llama",
+    "expected_sources": ["2310.06825.pdf"],
+    "note": "Mistral 7B vs Llama evaluation table"
+  },
+  {
+    "id": "s-005",
+    "query": "pre-fill chunking prompt processing",
+    "expected_sources": ["2310.06825.pdf"],
+    "note": "Mistral 7B pre-fill section"
+  },
+  {
+    "id": "s-006",
+    "query": "transformer architecture attention window size",
+    "expected_sources": ["2310.06825.pdf"],
+    "note": "SWA window configuration"
+  },
+  {
+    "id": "s-007",
+    "query": "instruction fine-tuning chat model",
+    "expected_sources": ["2310.06825.pdf"],
+    "note": "Mistral 7B instruct variant"
+  },
+  {
+    "id": "s-008",
+    "query": "model perplexity evaluation commonsense reasoning",
+    "expected_sources": ["2310.06825.pdf"],
+    "note": "Mistral benchmark results"
+  },
+  {
+    "id": "s-009",
+    "query": "xformers memory efficient attention implementation",
+    "expected_sources": ["2310.06825.pdf"],
+    "note": "Mistral xformers reference"
+  },
+  {
+    "id": "s-010",
+    "query": "7 billion parameter open source language model",
+    "expected_sources": ["2310.06825.pdf"],
+    "note": "Mistral 7B overview"
+  }
+]

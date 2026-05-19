@@ -36,6 +36,7 @@ CHUNK_OVERLAP = 50
 
 # Retrieval
 TOP_K = 4
+RERANKER_MODEL = os.getenv("RERANKER_MODEL", "cross-encoder/ms-marco-MiniLM-L-6-v2")
 
 # Semantic Scholar (optional — higher rate limits with key)
 SEMANTIC_SCHOLAR_API_KEY = os.getenv("SEMANTIC_SCHOLAR_API_KEY", "")

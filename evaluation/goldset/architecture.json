@@ -1,0 +1,35 @@
+[
+  {
+    "id": "a-001",
+    "arxiv_id": "2310.06825",
+    "title": "Mistral 7B",
+    "expected": {
+      "backbone": "Transformer",
+      "key_components_must_include": ["Sliding Window Attention", "Grouped-Query Attention"],
+      "has_key_results": true,
+      "has_datasets": true
+    }
+  },
+  {
+    "id": "a-002",
+    "arxiv_id": "1706.03762",
+    "title": "Attention Is All You Need",
+    "expected": {
+      "backbone": "Transformer",
+      "key_components_must_include": ["multi-head attention", "positional encoding"],
+      "has_key_results": true,
+      "has_datasets": true
+    }
+  },
+  {
+    "id": "a-003",
+    "arxiv_id": "2010.11929",
+    "title": "An Image is Worth 16x16 Words (ViT)",
+    "expected": {
+      "backbone": "Transformer",
+      "key_components_must_include": ["patch embedding", "multi-head attention"],
+      "has_key_results": true,
+      "has_datasets": true
+    }
+  }
+]

@@ -30,7 +30,22 @@ def extract_from_image(path: Union[str, Path]) -> str:
 
 
 def extract_from_pdf(path: Union[str, Path]) -> List[str]:
-    """PDF → list of OCR text strings, one per page."""
+    """PDF → list of text strings, one per page.
+
+    Uses pymupdf for digital PDFs (arXiv, born-digital). Falls back to
+    pdf2image + PaddleOCR for scanned PDFs with no embedded text.
+    """
+    try:
+        import fitz
+        doc = fitz.open(str(path))
+        pages = [page.get_text() for page in doc]
+        doc.close()
+        if any(p.strip() for p in pages):
+            return pages
+    except Exception:
+        pass
+
+    # Fallback: scanned PDF — requires poppler + PaddleOCR
     import tempfile, os
     pages = convert_from_path(str(path), dpi=300)
     results = []
