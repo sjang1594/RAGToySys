@@ -9,11 +9,11 @@ from retrieval.embedder import embed
 from retrieval.vectorstore import add
 from config import CHUNK_SIZE, CHUNK_OVERLAP
 
-
-def ingest(path: Union[str, Path]) -> int:
+def ingest(path: Union[str, Path], extra_metadata: dict = None) -> int:
     """
     Full ingestion pipeline: image/PDF → ChromaDB.
     Returns number of chunks stored.
+    extra_metadata is merged into every chunk's metadata (e.g. arxiv_id, title, authors).
     """
     path = Path(path)
     filename = path.name
@@ -41,6 +41,7 @@ def ingest(path: Union[str, Path]) -> int:
                 "page": page_num,
                 "chunk_index": chunk_idx,
                 "timestamp": timestamp,
+                **(extra_metadata or {}),
             }
             ids.append(chunk_id)
             documents.append(chunk_text)
@@ -55,7 +56,6 @@ def ingest(path: Union[str, Path]) -> int:
 
     print(f"[ingest] {filename} → {len(ids)} chunks stored")
     return len(ids)
-
 
 if __name__ == "__main__":
     import sys

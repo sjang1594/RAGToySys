@@ -1,23 +1,16 @@
 from typing import List, Dict, Any
 
-import anthropic
-
+from providers import get_llm_provider
+from providers.base import LLMProvider
 from retrieval.retriever import retrieve
-from config import ANTHROPIC_API_KEY, ANTHROPIC_BASE_URL, LLM_MODEL
 
+_provider: LLMProvider | None = None
 
-_client = None
-
-
-def _get_client() -> anthropic.Anthropic:
-    global _client
-    if _client is None:
-        _client = anthropic.Anthropic(
-            api_key=ANTHROPIC_API_KEY,
-            base_url=ANTHROPIC_BASE_URL,
-        )
-    return _client
-
+def _get_provider() -> LLMProvider:
+    global _provider
+    if _provider is None:
+        _provider = get_llm_provider()
+    return _provider
 
 def _build_prompt(question: str, chunks: List[Dict[str, Any]]) -> str:
     context_parts = []
@@ -28,7 +21,6 @@ def _build_prompt(question: str, chunks: List[Dict[str, Any]]) -> str:
 
     context = "\n\n".join(context_parts)
     return f"{context}\n\nQuestion: {question}"
-
 
 def ask(question: str, top_k: int = 4) -> Dict[str, Any]:
     """
@@ -42,15 +34,14 @@ def ask(question: str, top_k: int = 4) -> Dict[str, Any]:
 
     prompt = _build_prompt(question, chunks)
 
-    response = _get_client().messages.create(
-        model=LLM_MODEL,
-        max_tokens=1024,
+    response = _get_provider().complete(
+        messages=[{"role": "user", "content": prompt}],
         system=(
             "You are a helpful assistant. Answer the question using only the provided context. "
             "If the context does not contain enough information, say so. "
             "At the end of your answer, list the sources you used."
         ),
-        messages=[{"role": "user", "content": prompt}],
+        max_tokens=1024,
     )
 
     sources = [
@@ -58,11 +49,8 @@ def ask(question: str, top_k: int = 4) -> Dict[str, Any]:
         for c in chunks
     ]
 
-    return {
-        "answer": response.content[0].text,
-        "sources": sources,
-    }
-
+    text = next((b.text for b in response.content if b.type == "text"), "")
+    return {"answer": text, "sources": sources}
 
 if __name__ == "__main__":
     import sys

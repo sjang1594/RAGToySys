@@ -22,7 +22,7 @@
 ┌─────────────────────────────────────────────────────┐
 │                   INGESTION PIPELINE                │
 │                                                     │
-│  [Image/PDF] → [Preprocessor] → [Tesseract OCR]    │
+│  [Image/PDF] → [Preprocessor] → [Tesseract OCR]     │
 │                    ↓                                │
 │              [Text Cleaner]                         │
 │                    ↓                                │
