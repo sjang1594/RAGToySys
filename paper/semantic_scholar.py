@@ -9,11 +9,28 @@ _GRAPH = "https://api.semanticscholar.org/graph/v1"
 _RECO = "https://api.semanticscholar.org/recommendations/v1"
 _HEADERS = {"User-Agent": "RAGToySys/1.0"}
 
+_CACHE: dict[str, Any] = {}
+_LAST_REQUEST_TIME: float = 0.0
+_MIN_INTERVAL = 1.2  # seconds between requests (unauthenticated tier ~1 req/s)
+
 def _get(url: str, params: dict = None) -> Any:
+    global _LAST_REQUEST_TIME
+
+    cache_key = url + str(sorted((params or {}).items()))
+    if cache_key in _CACHE:
+        return _CACHE[cache_key]
+
     if SEMANTIC_SCHOLAR_API_KEY:
         _HEADERS["x-api-key"] = SEMANTIC_SCHOLAR_API_KEY
+
     for attempt in range(4):
+        elapsed = time.time() - _LAST_REQUEST_TIME
+        if elapsed < _MIN_INTERVAL:
+            time.sleep(_MIN_INTERVAL - elapsed)
+
+        _LAST_REQUEST_TIME = time.time()
         resp = requests.get(url, params=params, headers=_HEADERS, timeout=30)
+
         if resp.status_code == 429:
             wait = int(resp.headers.get("Retry-After", 2 ** attempt * 10))
             print(f"[s2] Rate limited, waiting {wait}s (attempt {attempt + 1}/4)")
@@ -22,7 +39,9 @@ def _get(url: str, params: dict = None) -> Any:
         if resp.status_code in (401, 403, 404):
             return None
         resp.raise_for_status()
-        return resp.json()
+        result = resp.json()
+        _CACHE[cache_key] = result
+        return result
     raise RuntimeError(f"Semantic Scholar rate limit exceeded: {url}")
 
 def get_paper(arxiv_id: str) -> dict | None:

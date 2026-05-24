@@ -196,6 +196,9 @@ def _tool_analyze_architecture(arxiv_id: str, include_figures: bool = False) -> 
     from config import PAPERS_DIR
     from extraction.architecture import extract_architecture
 
+    if isinstance(include_figures, str):
+        include_figures = include_figures.lower() not in ("false", "0", "no", "")
+
     bare_id = parse_id(arxiv_id)
     pdf_path = download_pdf(bare_id, PAPERS_DIR)
 
