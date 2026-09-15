@@ -246,7 +246,7 @@ def _dispatch(name: str, inputs: Dict[str, Any]) -> str:
         return _tool_reading_list(**inputs)
     if name == "analyze_paper_architecture":
         return _tool_analyze_architecture(**inputs)
-    return f"Unknown tool: {name}"
+    raise ValueError(f"Unknown tool: {name}")
 
 
 _provider: LLMProvider | None = None
@@ -283,11 +283,13 @@ def run(task: str, verbose: bool = True) -> str:
 
         messages.append(provider.response_to_message(response))
 
-        if response.stop_reason == "end_turn":
-            for block in response.content:
-                if hasattr(block, "text"):
-                    return block.text
-            return ""
+        text = "".join(block.text for block in response.content if block.type == "text")
+
+        if response.stop_reason != "tool_use":
+            if response.stop_reason in ("end_turn", "stop_sequence"):
+                return text
+            # max_tokens / refusal / pause_turn: sending tool_results cannot continue this turn
+            return f"[stopped: {response.stop_reason}] {text}".strip()
 
         tool_results = []
         for block in response.content:
@@ -295,15 +297,22 @@ def run(task: str, verbose: bool = True) -> str:
                 continue
             if verbose:
                 print(f"\n[tool] {block.name}({json.dumps(block.input, ensure_ascii=False)})")
-            result = _dispatch(block.name, block.input)
+            try:
+                result = _dispatch(block.name, block.input)
+                is_error = False
+            except Exception as e:  # a failing tool is reported to the model, not raised out of the loop
+                result = f"{type(e).__name__}: {e}"
+                is_error = True
             if verbose:
                 preview = result[:300] + "..." if len(result) > 300 else result
-                print(f"[result] {preview}")
-            tool_results.append({
-                "type": "tool_result",
-                "tool_use_id": block.id,
-                "content": result,
-            })
+                print(f"[{'error' if is_error else 'result'}] {preview}")
+            tool_result = {"type": "tool_result", "tool_use_id": block.id, "content": result}
+            if is_error:
+                tool_result["is_error"] = True
+            tool_results.append(tool_result)
+
+        if not tool_results:
+            return text
 
         messages.append({"role": "user", "content": tool_results})
 
